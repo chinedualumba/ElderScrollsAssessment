@@ -4,7 +4,11 @@ import { ElderScrollsService } from '../../services/elder-scrolls.service';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 import { EMPTY } from 'rxjs';
 import { ElderScrollActionTypes } from '../actions';
-import { GetCardsSuccess } from '../actions/elder-scrolls.action';
+import {
+  GetCardsSuccess,
+  GetFilteredCards,
+  GetMoreCards,
+} from '../actions/elder-scrolls.action';
 import { ElderScrollApiResponse } from '../state/elderCard.state.interface';
 
 @Injectable()
@@ -19,12 +23,44 @@ export class ElderScrollsEffects {
       ofType(ElderScrollActionTypes.GetCardsCommand),
       mergeMap(() =>
         this.elderScrollsService.getCards().pipe(
-          map((cards: ElderScrollApiResponse[]) => {
+          map((cards: ElderScrollApiResponse) => {
             return new GetCardsSuccess(cards);
           }),
           catchError(() => EMPTY)
         )
       )
+    )
+  );
+
+  getMoreCards$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ElderScrollActionTypes.GetMoreCardsCommand),
+      mergeMap((action: GetMoreCards) => {
+        console.log('action.payload', action.payload);
+
+        return this.elderScrollsService.getCards(action.payload).pipe(
+          map((cards: ElderScrollApiResponse) => {
+            return new GetCardsSuccess(cards);
+          }),
+          catchError(() => EMPTY)
+        );
+      })
+    )
+  );
+
+  getFilteredCards$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ElderScrollActionTypes.GetFilteredCardsCommand),
+      mergeMap((action: GetFilteredCards) => {
+        console.log('action.payload', action.payload);
+
+        return this.elderScrollsService.getFilteredCards(action.payload).pipe(
+          map((cards: ElderScrollApiResponse) => {
+            return new GetCardsSuccess(cards);
+          }),
+          catchError(() => EMPTY)
+        );
+      })
     )
   );
 }

@@ -7,11 +7,13 @@ import { EffectsModule } from '@ngrx/effects';
 import { ElderScrollsEffects } from './store/effects/elderScrolls.effects';
 import { ElderScrollsService } from './services/elder-scrolls.service';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [ElderScrollsCardsComponent],
   imports: [
     CommonModule,
+    FormsModule,
     HttpClientModule,
     StoreModule.forFeature('elderScrollsCards', elderScrollReducer),
     EffectsModule.forFeature([ElderScrollsEffects]),

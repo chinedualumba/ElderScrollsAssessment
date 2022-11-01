@@ -1,13 +1,12 @@
+import { Actions } from '@ngrx/effects';
 import { createFormArrayState, FormArrayState, setValue } from 'ngrx-forms';
 import {
   ElderScrollActionTypes,
   ElderScrollsActions,
 } from '../actions/elder-scrolls.action';
+import { INITIAL_ELDER_CARDS_STATE } from '../state/elderCard.initial-state';
 import {
-  INITIAL_ELDER_CARDS_STATE,
-  INITIAL_ELDER_SCROLL_STATE,
-} from '../state/elderCard.initial-state';
-import {
+  Api,
   ElderScroll,
   ElderScrollApiResponse,
   ElderScrollsState,
@@ -19,38 +18,71 @@ export function elderScrollReducer(
 ): ElderScrollsState {
   switch (action.type) {
     case ElderScrollActionTypes.GetCardsSuccessCommand: {
-      const mappedResponse: ElderScroll[] = mapToElderScroll(action.payload);
+      let currentCardsState: ElderScroll[] = state.cards.value;
+
+      if (
+        action.payload._links === undefined ||
+        action.payload._links.prev === undefined
+      ) {
+        currentCardsState = [];
+      }
+
+      const mappedCardsResponse: ElderScroll[] = mapToElderScrollCardInfo(
+        currentCardsState,
+        action.payload
+      );
 
       const returnedCards: FormArrayState<ElderScroll> = setValue(state.cards, [
-        ...mappedResponse,
+        ...mappedCardsResponse,
       ]);
-      state = { ...state, cards: returnedCards };
+
+      let apiResponse: Api = {
+        nextLink: undefined,
+        previousLink: undefined,
+      };
+
+      if (action.payload._links !== undefined) {
+        apiResponse = {
+          nextLink: action.payload._links.next,
+          previousLink: action.payload._links.prev,
+        };
+      }
+
+      state = {
+        ...state,
+        cards: returnedCards,
+        api: apiResponse,
+        totalCount: action.payload._totalCount,
+      };
+
       return state;
     }
 
     default: {
-      state = {
-        cards: INITIAL_ELDER_SCROLL_STATE,
-      };
-
       return state;
     }
   }
 }
 
-function mapToElderScroll(payloads: ElderScrollApiResponse[]): ElderScroll[] {
-  let mappedResponse: ElderScroll[] = [];
+function mapToElderScrollCardInfo(
+  stateValue: ElderScroll[],
+  payloads: ElderScrollApiResponse
+): ElderScroll[] {
+  let mappedResponse: ElderScroll[] =
+    stateValue.length > 0 ? [...stateValue] : [];
 
-  if (payloads !== undefined && payloads.length > 0) {
-    payloads.forEach((payload) => {
+  if (
+    payloads !== undefined &&
+    payloads.cards !== undefined &&
+    payloads.cards.length > 0
+  ) {
+    payloads.cards.forEach((cardItem) => {
       const newMappedItem: ElderScroll = {
-        cardName: payload.cards.name,
-        cardText: payload.cards.text,
-        imageUrl: payload.cards.imageUrl,
-        setName: payload.cards.set.name,
-        type: payload.cards.type,
-        nextLink: payload._links.next,
-        previousLink: payload._links.prev,
+        cardName: cardItem.name,
+        cardText: cardItem.text,
+        imageUrl: cardItem.imageUrl,
+        setName: cardItem.set.name,
+        type: cardItem.type,
       };
       mappedResponse.push(newMappedItem);
     });

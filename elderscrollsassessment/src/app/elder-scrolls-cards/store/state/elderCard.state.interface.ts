@@ -6,27 +6,27 @@ export interface ElderScroll {
   type: string;
   setName: string;
   cardText: string;
-  previousLink: string | undefined;
-  nextLink: string | undefined;
 }
 export interface ElderScrollApiResponse {
-  cards: {
-    name: string;
-    rarity: string;
-    type: string;
-    cost: number;
-    set: {
-      id: string;
+  cards: [
+    {
       name: string;
-      _self: string;
-    };
-    collectible: boolean;
-    text: string;
-    attributes: string[];
-    unique: boolean;
-    imageUrl: string;
-    id: string;
-  };
+      rarity: string;
+      type: string;
+      cost: number;
+      set: {
+        id: string;
+        name: string;
+        _self: string;
+      };
+      collectible: boolean;
+      text: string;
+      attributes: string[];
+      unique: boolean;
+      imageUrl: string;
+      id: string;
+    }
+  ];
   _links: {
     next: string | undefined;
     prev: string | undefined;
@@ -35,6 +35,13 @@ export interface ElderScrollApiResponse {
   _totalCount: number;
 }
 
+export interface Api {
+  nextLink: string | undefined;
+  previousLink: string | undefined;
+}
+
 export interface ElderScrollsState {
   cards: FormArrayState<ElderScroll>;
+  api: Api;
+  totalCount: number;
 }
