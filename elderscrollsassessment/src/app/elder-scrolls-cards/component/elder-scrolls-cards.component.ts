@@ -32,6 +32,7 @@ export class ElderScrollsCardsComponent implements OnInit {
   nextLink: string | undefined;
 
   searchValue: string = '';
+  imageIsLoaded = false;
 
   ngOnInit(): void {
     this.store.dispatch(new elderScrollActions.GetCards());
@@ -45,6 +46,18 @@ export class ElderScrollsCardsComponent implements OnInit {
     this.isLoadMoreDisabled$ = this.store
       .select(selectElderScrollState)
       .pipe(map((state) => (state.api.nextLink ? '' : 'disabled')));
+  }
+
+  loadCards(event: any) {
+    this.imageIsLoaded = false;
+
+    if (event.returnValue === true) {
+      setTimeout(() => {
+        this.imageIsLoaded = true;
+      }, 250);
+    }
+
+    return this.imageIsLoaded;
   }
 
   loadMore() {

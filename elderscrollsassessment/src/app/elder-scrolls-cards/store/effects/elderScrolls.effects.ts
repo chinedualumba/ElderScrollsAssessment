@@ -36,8 +36,6 @@ export class ElderScrollsEffects {
     this.actions$.pipe(
       ofType(ElderScrollActionTypes.GetMoreCardsCommand),
       mergeMap((action: GetMoreCards) => {
-        console.log('action.payload', action.payload);
-
         return this.elderScrollsService.getCards(action.payload).pipe(
           map((cards: ElderScrollApiResponse) => {
             return new GetCardsSuccess(cards);
@@ -52,8 +50,6 @@ export class ElderScrollsEffects {
     this.actions$.pipe(
       ofType(ElderScrollActionTypes.GetFilteredCardsCommand),
       mergeMap((action: GetFilteredCards) => {
-        console.log('action.payload', action.payload);
-
         return this.elderScrollsService.getFilteredCards(action.payload).pipe(
           map((cards: ElderScrollApiResponse) => {
             return new GetCardsSuccess(cards);

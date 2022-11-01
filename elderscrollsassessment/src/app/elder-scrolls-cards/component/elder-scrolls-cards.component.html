@@ -14,23 +14,26 @@
 
 <ng-container *ngIf="(cards$ | async) !== undefined" class="container">
   <div class="row">
-    <div *ngFor="let cardItem of (cards$ | async)?.value" class="col-2">
+    <div *ngFor="let cardItem of (cards$ | async)?.value" class="col-2 mb-3">
       <div class="card">
         <img
           [src]="cardItem.imageUrl"
           class="card-img-top"
           [alt]="cardItem.imageUrl"
+          (load)="loadCards($event)"
         />
-        <div class="card-body">
-          <h5 class="card-title">{{ cardItem.cardName }}</h5>
-          <p class="card-text">
-            {{ cardItem.cardText }}
-          </p>
+        <div *ngIf="imageIsLoaded">
+          <div class="card-body border-bottom bg-light">
+            <h5 class="card-title">{{ cardItem.cardName }}</h5>
+            <p class="card-text">
+              {{ cardItem.cardText }}
+            </p>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">{{ cardItem.type }}</li>
+            <li class="list-group-item">{{ cardItem.setName }}</li>
+          </ul>
         </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">{{ cardItem.type }}</li>
-          <li class="list-group-item">{{ cardItem.setName }}</li>
-        </ul>
       </div>
     </div>
   </div>
